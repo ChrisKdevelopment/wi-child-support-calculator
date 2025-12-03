@@ -2,723 +2,756 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Wisconsin Child Support Calculator (WI DCF 150)</title>
+<title>Wisconsin DCF 150 Child Support Calculator</title>
 
 <style>
     body {
-        font-family: Arial, sans-serif;
-        background: #f5f7fa;
-        color: #333;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: #f4f7fa;
         margin: 0;
         padding: 0;
+        color: #333;
     }
     header {
-        background: #2a6edb;
-        color: white;
-        padding: 20px;
-        font-size: 22px;
-        font-weight: bold;
+        background: #0b63d1;
+        color: #fff;
+        padding: 22px 20px;
         text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
     .container {
-        max-width: 1200px;
-        margin: 20px auto;
-        padding: 20px;
+        max-width: 1120px;
+        margin: 24px auto 40px;
+        padding: 0 16px;
+    }
+    .disclaimer-top {
+        font-size: 12px;
+        color: #555;
+        background: #fff7e0;
+        border: 1px solid #f1d48a;
+        border-radius: 6px;
+        padding: 8px 10px;
+        margin-bottom: 16px;
+    }
+    .layout {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+    }
+    .main-column {
+        flex: 3;
+    }
+    .summary-column {
+        flex: 1.3;
+        position: sticky;
+        top: 90px;
     }
     .section {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
+        background: #fff;
+        padding: 22px 20px;
+        border-radius: 10px;
         margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.07);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .section h2 {
         margin-top: 0;
-        font-size: 20px;
-        color: #2a6edb;
+        color: #0b63d1;
+        font-size: 19px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    .subnote {
+        font-size: 13px;
+        color: #555;
+        margin-bottom: 10px;
+    }
+    .legalnote {
+        font-size: 12px;
+        color: #777;
+        margin-top: 4px;
+    }
+    .tooltip {
+        text-decoration: underline dotted;
+        cursor: help;
+        color: #0b63d1;
+        font-weight: 500;
     }
     .row {
         display: flex;
-        gap: 20px;
         flex-wrap: wrap;
+        gap: 18px;
     }
     .col {
-        flex: 1 1 300px;
+        flex: 1 1 260px;
     }
     label {
         display: block;
         margin: 8px 0 4px;
-        font-weight: bold;
+        font-weight: 600;
+        font-size: 14px;
     }
     input, select {
         width: 100%;
-        padding: 7px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+        padding: 8px 10px;
+        border: 1px solid #c9cdd1;
+        border-radius: 6px;
+        font-size: 14px;
         box-sizing: border-box;
     }
-    .radio-group {
-        margin: 10px 0;
+    input[type="range"] {
+        width: 100%;
+        padding: 0;
     }
-    .radio-group label {
-        display: inline-block;
-        margin-right: 20px;
-        font-weight: normal;
+    .button-bar {
+        text-align: center;
+        margin-top: 18px;
     }
-    button {
+    .btn {
         padding: 10px 18px;
-        margin-top: 15px;
-        font-size: 16px;
-        border: none;
         border-radius: 6px;
+        border: none;
         cursor: pointer;
+        font-size: 14px;
+        margin: 5px;
+        font-weight: 600;
     }
-    .btn-primary {
-        background: #2a6edb;
-        color: white;
+    .btn-secondary {
+        background: #777;
+        color: #fff;
     }
-    .btn-reset {
-        background: #999;
-        color: white;
-        margin-left: 10px;
-    }
-    #result {
-        white-space: pre-wrap;
-        background: #eef2f7;
-        padding: 15px;
-        border-radius: 8px;
+    #summaryBox {
+        background: #eef3fa;
+        border-left: 4px solid #0b63d1;
+        padding: 18px 16px;
+        border-radius: 6px;
         font-family: Consolas, monospace;
+        white-space: pre-line;
+        min-height: 220px;
         font-size: 13px;
     }
-    #summaryTable table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
+
+    /* Quick summary card */
+    .summary-card {
+        background: #ffffff;
+        padding: 18px 16px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        border: 1px solid #d7dde7;
     }
-    #summaryTable th, #summaryTable td {
-        border: 1px solid #d0d7e2;
+    .summary-card h3 {
+        margin-top: 0;
+        margin-bottom: 6px;
+        font-size: 18px;
+        color: #0b63d1;
+    }
+    .quick-direction {
+        font-size: 13px;
+        color: #555;
+        margin-bottom: 6px;
+    }
+    .quick-total {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    .quick-split {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+    .quick-person {
+        flex: 1;
+        background: #f7f9fd;
+        border-radius: 8px;
         padding: 8px 10px;
-        text-align: left;
     }
-    #summaryTable th {
-        background: #f0f4fb;
-        font-weight: bold;
+    .quick-name {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .quick-amount {
+        font-size: 16px;
+        font-weight: 700;
+    }
+    .quick-note {
+        font-size: 11px;
+        color: #777;
+        margin-top: 6px;
     }
 
-    /* Tooltip styling */
-    .has-tooltip {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
+    .amount-owe {
+        color: #c53030; /* red */
     }
-    .info-icon {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        line-height: 16px;
-        text-align: center;
+    .amount-rec {
+        color: #0b8a3c; /* green */
+    }
+    .amount-neutral {
+        color: #555;
+    }
+
+    footer {
         font-size: 11px;
-        border-radius: 50%;
-        background: #2a6edb;
-        color: white;
-        cursor: default;
-    }
-    .info-icon::after {
-        content: attr(data-tip);
-        position: absolute;
-        left: 0;
-        top: 110%;
-        z-index: 10;
-        max-width: 320px;
-        background: #ffffff;
-        color: #333;
-        border: 1px solid #c2c9d6;
-        border-radius: 6px;
-        padding: 8px 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        font-weight: normal;
-        font-size: 12px;
-        line-height: 1.4;
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(4px);
-        transition: opacity 0.15s ease, transform 0.15s ease;
-        white-space: normal;
-    }
-    .info-icon:hover::after {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    small.helper-text {
-        display: block;
-        margin-top: 4px;
         color: #666;
-        font-size: 11px;
+        padding: 14px 16px 24px;
+        text-align: center;
+    }
+
+    @media (max-width: 900px) {
+        .layout {
+            flex-direction: column;
+        }
+        .summary-column {
+            position: static;
+            margin-top: 8px;
+        }
     }
 </style>
-
 </head>
+
 <body>
 
-<header>Wisconsin Child Support Calculator (WI DCF 150)</header>
+<header>Wisconsin Child Support Calculator — WI DCF 150</header>
 
 <div class="container">
 
-    <!-- Parent Info -->
-    <div class="section">
-        <h2>Parent Information</h2>
-        <div class="row">
-
-            <div class="col">
-                <label for="nameA">Parent A Name</label>
-                <input id="nameA" value="Parent A">
-
-                <label class="has-tooltip" for="incA">
-                    Parent A ANNUAL Gross Income ($)
-                    <span class="info-icon" data-tip="DCF 150.03 and Wis. Stat. 767.511 define gross income as income from all sources before mandatory deductions (wages, bonuses, commissions, overtime, self-employment, pensions, and voluntary retirement contributions). Case law such as Ashleigh N.H. and Jarman v. Welter holds that per diems above expenses and overtime are generally included as gross income."></span>
-                </label>
-                <input id="incA" type="number" step="0.01" value="139750">
-
-                <label class="has-tooltip" for="placeA">
-                    Parent A Placement (% of overnights)
-                    <span class="info-icon" data-tip="Shared placement calculations under DCF 150.04(2) depend on the percentage of overnights with each parent. The child must spend at least 25% of overnights with each parent to use the shared-placement formula."></span>
-                </label>
-                <input id="placeA" type="number" value="50">
-
-                <label class="has-tooltip" for="priorA">
-                    Parent A Prior Monthly Support Order ($)
-                    <span class="info-icon" data-tip='Used for the serial-family method under DCF 150.04(1) and related worksheets. Earlier child support obligations are deducted from the payer&apos;s income to determine income available for later cases, but the first family receives the full percentage on gross income.'></span>
-                </label>
-                <input id="priorA" type="number" value="1374">
-            </div>
-
-            <div class="col">
-                <label for="nameB">Parent B Name</label>
-                <input id="nameB" value="Parent B">
-
-                <label class="has-tooltip" for="incB">
-                    Parent B ANNUAL Gross Income ($)
-                    <span class="info-icon" data-tip="Same definition of gross income as for Parent A. Under DCF 150 and Wis. Stat. 767.511, all income sources are considered unless specifically excluded by statute or case law."></span>
-                </label>
-                <input id="incB" type="number" step="0.01" value="25200">
-
-                <label class="has-tooltip" for="placeB">
-                    Parent B Placement (% of overnights)
-                    <span class="info-icon" data-tip="Placement percentages are normalized to 100% between both parents. Shared placement formulas are applied where each parent has at least 25% of overnights as provided under DCF 150.04(2)."></span>
-                </label>
-                <input id="placeB" type="number" value="50">
-
-                <label class="has-tooltip" for="priorB">
-                    Parent B Prior Monthly Support Order ($)
-                    <span class="info-icon" data-tip="If Parent B is a serial-family payer, prior child support obligations in earlier cases are subtracted from monthly income before calculating support in this case, consistent with DCF 150.04(1) and the serial-family worksheets."></span>
-                </label>
-                <input id="priorB" type="number" value="0">
-            </div>
-
-        </div>
+    <div class="disclaimer-top">
+        This calculator provides an unofficial estimate based on Wisconsin DCF 150 guidelines. It is for educational purposes only
+        and is not legal advice. Actual court-ordered support may differ.
     </div>
 
-    <!-- Case Info -->
-    <div class="section">
-        <h2>Case Details</h2>
+    <div class="layout">
 
-        <div class="row">
-            <div class="col">
-                <label class="has-tooltip" for="caseKids">
-                    Number of children in THIS case
-                    <span class="info-icon" data-tip="DCF 150.035(2) and DCF 150 Appendix specify standard percentage-of-income rates: 17% for 1 child, 25% for 2, 29% for 3, 31% for 4, and 34% for 5 or more. This field is only for children in this specific case, not all children the parent has."></span>
-                </label>
-                <input id="caseKids" type="number" value="1">
+        <!-- ==================== MAIN COLUMN ==================== -->
+        <div class="main-column">
 
-                <label class="has-tooltip" for="ssdiDep">
-                    Dependent SSDI paid for these children ($/mo)
-                    <span class="info-icon" data-tip="If the child receives a Social Security dependent benefit based on the payer&apos;s disability or retirement, federal and Wisconsin guidance typically allow crediting that benefit against the child support obligation, reducing the cash support dollar for dollar up to the ordered amount."></span>
-                </label>
-                <input id="ssdiDep" type="number" value="268">
+            <!-- Parent Income -->
+            <div class="section">
+                <h2>Parent Income</h2>
+                <div class="subnote">
+                    Gross income is defined in <span class="tooltip" title="DCF 150.02(13) — Gross income includes all income from all sources before mandatory deductions.">DCF 150.02(13)</span>.
+                    Enter yearly gross income for each parent.
+                </div>
 
-                <div class="radio-group">
-                    <span class="has-tooltip">
-                        <span style="font-weight:bold;">Serial-Family Payer for THIS case</span>
-                        <span class="info-icon" data-tip="Under the serial-family provisions in DCF 150.04(1) and the state&apos;s serial-family worksheet, the court subtracts established support for earlier children from the payer&apos;s income, then applies the percentage standard to the remaining income for later children. Choose which parent is treated as the serial-family payer for this calculation."></span>
-                    </span>
-                    <br>
-                    <label><input type="radio" name="payer" value="A" checked> Parent A as serial-family payer</label>
-                    <label><input type="radio" name="payer" value="B"> Parent B as serial-family payer</label>
+                <div class="row">
+                    <div class="col">
+                        <label>Parent 1 Name</label>
+                        <input id="nameA" value="Parent 1">
+                    </div>
+                    <div class="col">
+                        <label>Parent 2 Name</label>
+                        <input id="nameB" value="Parent 2">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Parent 1 Yearly Gross Income ($)</label>
+                        <input id="incA" type="number" step="0.01" value="0">
+                    </div>
+                    <div class="col">
+                        <label>Parent 2 Yearly Gross Income ($)</label>
+                        <input id="incB" type="number" step="0.01" value="0">
+                    </div>
                 </div>
             </div>
 
-            <div class="col">
-                <label class="has-tooltip" for="judgeDev">
-                    Judicial Deviation (%)
-                    <span class="info-icon" data-tip="Wis. Stat. 767.511 and DCF 150.02 treat guideline amounts as a rebuttable presumption. Courts may deviate up or down based on statutory factors: needs of the child, earning capacity, health, shared-placement costs, travel, and other equitable considerations. Enter a positive % for upward deviation or negative % for downward deviation."></span>
-                </label>
-                <input id="judgeDev" type="number" value="0">
-                <small class="helper-text">
-                    Positive = upward deviation, negative = downward deviation. Applied after guideline math but before garnishment caps.
-                </small>
+            <!-- Placement with slider -->
+            <div class="section">
+                <h2>Placement (Overnights per Year)</h2>
+                <div class="subnote">
+                    Shared-placement obligations are set under <span class="tooltip" title="DCF 150.04(2) — Each parent’s support is adjusted by 150% of the base and the other parent’s placement percentage.">DCF 150.04(2)</span>.
+                    Use the slider to adjust Parent 1's overnights; Parent 2's share updates automatically.
+                </div>
+
+                <label>Parent 1 Overnights per Year</label>
+                <input id="overnightsA" type="range" min="0" max="365" value="182">
+                <div class="subnote" id="overnightsInfo">
+                    Parent 1: <span id="placeAInfo">182 nights (~49.86%)</span> •
+                    Parent 2: <span id="placeBInfo">183 nights (~50.14%)</span>
+                </div>
+            </div>
+
+            <!-- Case Details -->
+            <div class="section">
+                <h2>Case Details</h2>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Number of Children in This Case</label>
+                        <input id="caseKids" type="number" value="1">
+                    </div>
+                    <div class="col">
+                        <label>SSDI Dependent Benefit ($ / month)</label>
+                        <input id="ssdiDep" type="number" value="0">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Which Parent Receives the SSDI Benefit?</label>
+                        <select id="ssdiRecipient">
+                            <option value="none">None / Not Applicable</option>
+                            <option value="A">Parent 1</option>
+                            <option value="B">Parent 2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top:10px;">
+                    <div class="col">
+                        <label>Parent 1 Prior Support Order ($ / month)</label>
+                        <input id="priorA" type="number" value="0">
+                    </div>
+                    <div class="col">
+                        <label>Parent 2 Prior Support Order ($ / month)</label>
+                        <input id="priorB" type="number" value="0">
+                    </div>
+                </div>
+
+                <div class="legalnote">
+                    Serial-family adjustments follow <span class="tooltip" title="DCF 150.04(1) — Existing legal obligations reduce income available for a new support order.">DCF 150.04(1)</span>.
+                </div>
+            </div>
+
+            <!-- Insurance -->
+            <div class="section">
+                <h2>Health Insurance</h2>
+
+                <div class="subnote">
+                    Credits for health insurance are governed by 
+                    <span class="tooltip" title="DCF 150.05 — Premiums paid by either parent may be credited in calculating support.">DCF 150.05</span>.
+                </div>
+
+                <label>Insurance Calculation Method</label>
+                <select id="insuranceMode">
+                    <option value="none">No Private Insurance / Ignore Premiums</option>
+                    <option value="proportional">Option A – Proportional Income-Share Credit</option>
+                    <option value="worksheet">Option B – Integrated Worksheet Adjustment (simplified)</option>
+                </select>
+
+                <div class="row" style="margin-top:10px;">
+                    <div class="col">
+                        <label>Parent 1 Monthly Premium ($)</label>
+                        <input id="premA" type="number" value="0">
+                    </div>
+                    <div class="col">
+                        <label>Parent 2 Monthly Premium ($)</label>
+                        <input id="premB" type="number" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Garnishment Context -->
+            <div class="section">
+                <h2>Garnishment Context (Optional)</h2>
+                <div class="subnote">
+                    Federal/Wisconsin limits: 50/55/60/65% of disposable income depending on intact family and arrears.
+                    This section checks whether the estimated support fits within those limits and caps the result.
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Parent 1 Monthly Disposable Income ($)</label>
+                        <input id="dispA" type="number" value="0">
+                        <label>Parent 1 Intact Family Living With Them?</label>
+                        <select id="intactA">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                        <label>Parent 1 Has Arrears?</label>
+                        <select id="arrearsA">
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+
+                    <div class="col">
+                        <label>Parent 2 Monthly Disposable Income ($)</label>
+                        <input id="dispB" type="number" value="0">
+                        <label>Parent 2 Intact Family Living With Them?</label>
+                        <select id="intactB">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                        <label>Parent 2 Has Arrears?</label>
+                        <select id="arrearsB">
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Judicial Deviation -->
+            <div class="section">
+                <h2>Judicial Deviation (Optional)</h2>
+                <div class="subnote">
+                    Courts may deviate from guidelines per 
+                    <span class="tooltip" title="DCF 150.03(3) / Wis. Stat. 767.511 — Courts may deviate based on factors such as special needs, childcare, travel, and financial resources.">
+                        DCF 150.03(3) / Wis. Stat. 767.511
+                    </span>.
+                </div>
+
+                <label>Deviation Amount to Apply (+ / − $ / month)</label>
+                <input id="deviation" type="number" value="0">
+            </div>
+
+            <!-- Detailed Summary -->
+            <div class="section">
+                <h2>Detailed Summary (Attorney View)</h2>
+                <div id="summaryBox">Enter values above. Results update automatically.</div>
+                <div class="button-bar">
+                    <button class="btn btn-secondary" onclick="window.print()">Print / PDF</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==================== SUMMARY COLUMN ==================== -->
+        <div class="summary-column">
+            <div class="summary-card">
+                <h3>Estimated Monthly Support</h3>
+                <div id="quickDirection" class="quick-direction">No payment estimated.</div>
+                <div id="quickTotal" class="quick-total amount-neutral">$0.00</div>
+
+                <div class="quick-split">
+                    <div class="quick-person">
+                        <div id="quickNameA" class="quick-name">Parent 1</div>
+                        <div id="quickA" class="quick-amount amount-neutral">$0.00</div>
+                    </div>
+                    <div class="quick-person">
+                        <div id="quickNameB" class="quick-name">Parent 2</div>
+                        <div id="quickB" class="quick-amount amount-neutral">$0.00</div>
+                    </div>
+                </div>
+
+                <div class="quick-note">
+                    Green (+) = receives. Red (−) = owes. Values update automatically as you change the inputs.
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Insurance Section -->
-    <div class="section">
-        <h2>Health Insurance</h2>
+    </div> <!-- /layout -->
+</div> <!-- /container -->
 
-        <label class="has-tooltip" for="insuranceMode">
-            Select Insurance Calculation Method
-            <span class="info-icon" data-tip="DCF 150.05 and related guidance allocate the cost of health insurance and uninsured medical expenses between parents, usually in proportion to income. Option A estimates each parent&apos;s share of the other&apos;s premium. Option B approximates an integrated worksheet credit. &apos;No private insurance&apos; assumes coverage like BadgerCare or no premium-based adjustment."></span>
-        </label>
-        <select id="insuranceMode">
-            <option value="none">No Private Insurance (BadgerCare / none)</option>
-            <option value="proportional">Option A - Proportional Income-Share Premium Credit</option>
-            <option value="worksheet">Option B - Integrated Worksheet Method (simplified)</option>
-        </select>
-
-        <div class="row">
-            <div class="col">
-                <label class="has-tooltip" for="premA">
-                    Parent A Monthly Health Premium ($)
-                    <span class="info-icon" data-tip="Monthly health insurance premium paid by Parent A that covers the child in this case. The court may assign part of this cost to the other parent based on relative incomes, rather than simply shifting all cost to the premium-paying parent."></span>
-                </label>
-                <input id="premA" type="number" value="277.36">
-            </div>
-
-            <div class="col">
-                <label class="has-tooltip" for="premB">
-                    Parent B Monthly Health Premium ($)
-                    <span class="info-icon" data-tip="Monthly health insurance premium paid by Parent B that covers the child in this case. This is used for proportional sharing or worksheet-style credits depending on the selected method."></span>
-                </label>
-                <input id="premB" type="number" value="0">
-            </div>
-        </div>
-    </div>
-
-    <!-- WI Disposable Income / Garnishment -->
-    <div class="section">
-        <h2>Wisconsin Disposable Income & Garnishment Limits</h2>
-
-        <label class="has-tooltip" for="useDisposable">
-            Apply WI Disposable Income Garnishment Cap?
-            <span class="info-icon" data-tip="Federal CCPA limits and Wisconsin enforcement rules cap the portion of disposable earnings that can be withheld for support: generally 50% if the payer supports another family and has no arrears, 55% with arrears, 60% if no other family, and 65% with arrears. This does not change the court order amount, but affects what can be withheld from pay."></span>
-        </label>
-        <select id="useDisposable">
-            <option value="no" selected>No</option>
-            <option value="yes">Yes</option>
-        </select>
-
-        <div class="row">
-            <div class="col">
-                <label class="has-tooltip" for="dispA">
-                    Parent A Monthly Disposable Income ($)
-                    <span class="info-icon" data-tip="Disposable income is gross earnings minus federal, state, local income tax and Social Security taxes. Voluntary deductions (retirement, health savings, union dues) do not reduce disposable income for garnishment purposes. Used only if Parent A is the actual payer in this case."></span>
-                </label>
-                <input id="dispA" type="number" value="0">
-            </div>
-            <div class="col">
-                <label class="has-tooltip" for="dispB">
-                    Parent B Monthly Disposable Income ($)
-                    <span class="info-icon" data-tip="Disposable income for Parent B, defined the same way. If Parent B ends up as the payer by the shared-placement math, this will be the base for garnishment caps when that option is enabled."></span>
-                </label>
-                <input id="dispB" type="number" value="0">
-            </div>
-        </div>
-
-        <label class="has-tooltip" for="wiLimit">
-            Garnishment Category for ACTUAL Payer (WI limit)
-            <span class="info-icon" data-tip="Wisconsin follows the federal Consumer Credit Protection Act ranges for support withholding: 50% of disposable earnings if the payer supports another family and has no arrears, 55% if they have arrears, 60% if they do not support another family, and 65% with arrears. This limit applies to what can be withheld from pay, not as a substitute for the guideline formula."></span>
-        </label>
-        <select id="wiLimit">
-            <option value="50">Intact family, no arrears → 50% of disposable income</option>
-            <option value="55">Intact family, WITH arrears → 55% of disposable income</option>
-            <option value="60">No intact family, no arrears → 60% of disposable income</option>
-            <option value="65">No intact family, WITH arrears → 65% of disposable income</option>
-        </select>
-
-        <small class="helper-text">
-            This cap is applied only to the parent who actually pays support in this case (by shared-placement math), after guideline calculations and deviations.
-        </small>
-    </div>
-
-    <!-- Buttons -->
-    <div class="section">
-        <button class="btn-primary" onclick="runCalc()">Recalculate Now</button>
-        <button class="btn-reset" onclick="location.reload()">Reset</button>
-        <small class="helper-text">
-            All fields are calculated in real time as you edit. The "Recalculate" button is optional.
-        </small>
-    </div>
-
-    <!-- Summary Table -->
-    <div class="section">
-        <h2>Summary Table</h2>
-        <div id="summaryTable">
-            <em>Edit any field above. The summary updates automatically.</em>
-        </div>
-    </div>
-
-    <!-- Results -->
-    <div class="section">
-        <h2>Detailed Calculation Output</h2>
-        <div id="result">Enter values above. Calculations run automatically.</div>
-    </div>
-
-</div>
+<footer>
+    This calculator uses public Wisconsin DCF 150 formulas in a simplified way and does not replace individual legal advice or a court
+    determination. Use at your own discretion and consult a licensed Wisconsin family law attorney for specific guidance.
+</footer>
 
 <script>
-/* =============================
-   WI Percentage and High-Income
-   (DCF 150 / Appendix & worksheets)
-============================= */
-
+/* ---------- Percentage helpers ---------- */
 function pctForKids(k) {
-    if (k === 1) return 0.17;
+    if (k <= 1) return 0.17;
     if (k === 2) return 0.25;
     if (k === 3) return 0.29;
     if (k === 4) return 0.31;
-    return 0.34; // 5 or more
+    return 0.34;
 }
-
 function highIncomePercents(k) {
-    // Tiered percentages above 7k/month and 12.5k/month per DCF 150.04(5) and high-income worksheet
-    if (k === 1) return [0.17, 0.14, 0.10];
-    if (k === 2) return [0.25, 0.20, 0.15];
-    if (k === 3) return [0.29, 0.23, 0.17];
-    if (k === 4) return [0.31, 0.25, 0.19];
-    return [0.34, 0.27, 0.20];
+    if (k <= 1) return [0.17, 0.14, 0.10];
+    if (k === 2) return [0.25, 0.22, 0.19];
+    if (k === 3) return [0.29, 0.27, 0.24];
+    if (k === 4) return [0.31, 0.29, 0.26];
+    return [0.34, 0.32, 0.29];
 }
-
-function calcHighIncomeBase(monthlyIncome, kids) {
+function calcHighIncomeBase(monthlyInc, kids) {
     const [t1, t2, t3] = highIncomePercents(kids);
-    const cap1 = 7000, cap2 = 12500;
-    if (monthlyIncome <= cap1) {
-        return monthlyIncome * t1;
+    const cap1 = 7000, cap2 = 11000;
+    if (monthlyInc <= cap1) {
+        return monthlyInc * t1;
+    } else if (monthlyInc <= cap2) {
+        return cap1 * t1 + (monthlyInc - cap1) * t2;
+    } else {
+        return cap1 * t1 + (cap2 - cap1) * t2 + (monthlyInc - cap2) * t3;
     }
-    if (monthlyIncome <= cap2) {
-        return cap1 * t1 + (monthlyIncome - cap1) * t2;
-    }
-    return (
-        cap1 * t1 +
-        (cap2 - cap1) * t2 +
-        (monthlyIncome - cap2) * t3
-    );
+}
+function calcNormalBase(monthlyInc, kids) {
+    return monthlyInc * pctForKids(kids);
 }
 
-function calcNormalBase(monthlyIncome, kids) {
-    return monthlyIncome * pctForKids(kids);
-}
-
-/* =============================
-         MAIN CALC
-============================= */
-
+/* ---------- Main calculation ---------- */
 function runCalc() {
-    try {
-        // --- Inputs ---
-        let nameA = document.getElementById("nameA").value || "Parent A";
-        let nameB = document.getElementById("nameB").value || "Parent B";
+    // Names
+    const nameA = (document.getElementById('nameA').value || 'Parent 1').trim();
+    const nameB = (document.getElementById('nameB').value || 'Parent 2').trim();
+    document.getElementById('quickNameA').textContent = nameA;
+    document.getElementById('quickNameB').textContent = nameB;
 
-        // Annual gross → monthly gross
-        let incA_year = parseFloat(document.getElementById("incA").value) || 0;
-        let incB_year = parseFloat(document.getElementById("incB").value) || 0;
+    // Yearly to monthly gross
+    const yearA = parseFloat(document.getElementById('incA').value) || 0;
+    const yearB = parseFloat(document.getElementById('incB').value) || 0;
+    const grossA = yearA / 12;
+    const grossB = yearB / 12;
 
-        let incA = incA_year / 12.0;
-        let incB = incB_year / 12.0;
+    // Placement via overnights slider
+    let nightsA = parseInt(document.getElementById('overnightsA').value, 10);
+    if (isNaN(nightsA)) nightsA = 0;
+    if (nightsA < 0) nightsA = 0;
+    if (nightsA > 365) nightsA = 365;
+    const nightsB = 365 - nightsA;
+    const placeA = (nightsA / 365) * 100;
+    const placeB = 100 - placeA;
 
-        let placeA = parseFloat(document.getElementById("placeA").value) || 0;
-        let placeB = parseFloat(document.getElementById("placeB").value) || 0;
+    document.getElementById('overnightsA').value = nightsA;
+    document.getElementById('placeAInfo').textContent =
+        `${nightsA} nights (~${placeA.toFixed(2)}%)`;
+    document.getElementById('placeBInfo').textContent =
+        `${nightsB} nights (~${placeB.toFixed(2)}%)`;
 
-        let priorA = parseFloat(document.getElementById("priorA").value) || 0;
-        let priorB = parseFloat(document.getElementById("priorB").value) || 0;
+    // Case details
+    const kids = Math.max(1, parseInt(document.getElementById('caseKids').value, 10) || 1);
+    const ssdiDep = parseFloat(document.getElementById('ssdiDep').value) || 0;
+    const ssdiRecipient = document.getElementById('ssdiRecipient').value;
+    const priorA = parseFloat(document.getElementById('priorA').value) || 0;
+    const priorB = parseFloat(document.getElementById('priorB').value) || 0;
 
-        let caseKids = parseInt(document.getElementById("caseKids").value) || 1;
-        if (caseKids < 1) caseKids = 1;
+    // Insurance
+    const insuranceMode = document.getElementById('insuranceMode').value;
+    const premA = parseFloat(document.getElementById('premA').value) || 0;
+    const premB = parseFloat(document.getElementById('premB').value) || 0;
 
-        let ssdiDep = parseFloat(document.getElementById("ssdiDep").value) || 0;
+    // Garnishment context
+    const dispA = parseFloat(document.getElementById('dispA').value) || 0;
+    const dispB = parseFloat(document.getElementById('dispB').value) || 0;
+    const intactA = document.getElementById('intactA').value === 'yes';
+    const intactB = document.getElementById('intactB').value === 'yes';
+    const arrearsA = document.getElementById('arrearsA').value === 'yes';
+    const arrearsB = document.getElementById('arrearsB').value === 'yes';
 
-        let payer = document.querySelector("input[name='payer']:checked") ?
-            document.querySelector("input[name='payer']:checked").value : "A";
+    // Deviation
+    const deviation = parseFloat(document.getElementById('deviation').value) || 0;
 
-        let insuranceMode = document.getElementById("insuranceMode").value;
+    // Serial-family adjustments
+    let effA = grossA;
+    let effB = grossB;
+    let serialTxt = '';
 
-        let premA = parseFloat(document.getElementById("premA").value) || 0;
-        let premB = parseFloat(document.getElementById("premB").value) || 0;
+    if (priorA > 0) {
+        const newEffA = Math.max(0, grossA - priorA);
+        serialTxt += `${nameA}: prior order $${priorA.toFixed(2)} → effective income $${newEffA.toFixed(2)}\n`;
+        effA = newEffA;
+    }
+    if (priorB > 0) {
+        const newEffB = Math.max(0, grossB - priorB);
+        serialTxt += `${nameB}: prior order $${priorB.toFixed(2)} → effective income $${newEffB.toFixed(2)}\n`;
+        effB = newEffB;
+    }
+    if (!serialTxt) {
+        serialTxt = 'No serial-family reduction applied.\n';
+    }
 
-        let judgeDev = parseFloat(document.getElementById("judgeDev").value);
-        if (isNaN(judgeDev)) judgeDev = 0;
+    // Base support using high-income tiers if applicable
+    let baseA, baseB;
+    let baseTxt = '';
+    if (effA > 7000) {
+        baseA = calcHighIncomeBase(effA, kids);
+        baseTxt += `${nameA} treated as high-income (> $7,000/month). `;
+    } else {
+        baseA = calcNormalBase(effA, kids);
+    }
+    if (effB > 7000) {
+        baseB = calcHighIncomeBase(effB, kids);
+        baseTxt += `${nameB} treated as high-income (> $7,000/month). `;
+    } else {
+        baseB = calcNormalBase(effB, kids);
+    }
+    baseTxt += `\nBase support (before shared placement): ${nameA} $${baseA.toFixed(2)}, ${nameB} $${baseB.toFixed(2)}\n`;
 
-        let useDisposable = document.getElementById("useDisposable").value === "yes";
-        let dispA = parseFloat(document.getElementById("dispA").value) || 0;
-        let dispB = parseFloat(document.getElementById("dispB").value) || 0;
-        let wiLimitPct = parseFloat(document.getElementById("wiLimit").value) || 0;
+    // Shared placement obligations
+    const obligA = baseA * 1.5 * (placeB / 100);
+    const obligB = baseB * 1.5 * (placeA / 100);
 
-        // Normalize placement to 100% total
-        if (placeA + placeB === 0) {
-            placeA = 50;
-            placeB = 50;
-        } else {
-            let tot = placeA + placeB;
-            placeA = placeA / tot * 100.0;
-            placeB = placeB / tot * 100.0;
-        }
+    let payer = 'A';
+    let payName = nameA;
+    let otherName = nameB;
+    let rawSupport = obligA - obligB;
+    if (rawSupport < 0) {
+        payer = 'B';
+        payName = nameB;
+        otherName = nameA;
+        rawSupport = Math.abs(rawSupport);
+    }
 
-        // --- Serial-family effective income ---
-        let effA = incA;
-        let effB = incB;
-        let serialTxt = "";
+    // Insurance adjustments (to payer)
+    let insuranceTxt = '';
+    let insuranceAdj = 0;
+    if (insuranceMode === 'proportional') {
+        const totalGross = grossA + grossB;
+        if (totalGross > 0) {
+            const shareA = grossA / totalGross;
+            const shareB = grossA + grossB === 0 ? 0 : grossB / totalGross;
 
-        if (payer === "A" && priorA > 0) {
-            effA = Math.max(0, incA - priorA);
-            serialTxt += `${nameA}: Serial-family reduction using prior monthly order $${priorA.toFixed(2)} → effective income for THIS case: $${effA.toFixed(2)}\n`;
-        } else if (payer === "B" && priorB > 0) {
-            effB = Math.max(0, incB - priorB);
-            serialTxt += `${nameB}: Serial-family reduction using prior monthly order $${priorB.toFixed(2)} → effective income for THIS case: $${effB.toFixed(2)}\n`;
-        } else {
-            serialTxt += `No serial-family reduction applied for this case.\n`;
-        }
-
-        // --- High income detection based on effective monthly income ---
-        let isHighA = (payer === "A" && effA > 7000);
-        let isHighB = (payer === "B" && effB > 7000);
-
-        // --- Base Support for each parent (ignoring placement) ---
-        let baseA, baseB;
-        let baseTxt = "";
-
-        if (isHighA) {
-            baseA = calcHighIncomeBase(effA, caseKids);
-            baseB = calcNormalBase(effB, caseKids);
-            baseTxt += `${nameA} is HIGH-INCOME under DCF 150.04(5).\nBase support (A): $${baseA.toFixed(2)}\nBase support (B): $${baseB.toFixed(2)}\n`;
-        } else if (isHighB) {
-            baseA = calcNormalBase(effA, caseKids);
-            baseB = calcHighIncomeBase(effB, caseKids);
-            baseTxt += `${nameB} is HIGH-INCOME under DCF 150.04(5).\nBase support (A): $${baseA.toFixed(2)}\nBase support (B): $${baseB.toFixed(2)}\n`;
-        } else {
-            baseA = calcNormalBase(effA, caseKids);
-            baseB = calcNormalBase(effB, caseKids);
-            baseTxt += `Neither parent is high-income under DCF 150. Base support:\n${nameA}: $${baseA.toFixed(2)}\n${nameB}: $${baseB.toFixed(2)}\n`;
-        }
-
-        // --- Shared Placement Obligations (DCF 150 shared formula) ---
-        let obligA = baseA * 1.5 * (placeB / 100.0);
-        let obligB = baseB * 1.5 * (placeA / 100.0);
-
-        let payerMath = (obligA > obligB) ? "A" : "B";
-        let rawSupport = Math.abs(obligA - obligB);
-        let payingName = payerMath === "A" ? nameA : nameB;
-
-        // --- Insurance Adjustments ---
-        let insuranceTxt = "";
-        let insuranceAdj = 0;
-
-        if (insuranceMode === "proportional") {
-            let totalIncome = incA + incB;
-            if (totalIncome <= 0) {
-                insuranceTxt += `Cannot compute proportional premium share: total income is zero.\n`;
-            } else {
-                let shareA = incA / totalIncome;
-                let shareB = incB / totalIncome;
-
-                if (premA > 0) {
-                    let owedByB = premA * shareB;
-                    insuranceAdj += (payerMath === "A") ? -owedByB : owedByB;
-                    insuranceTxt += `Proportional method: ${nameB} share of ${nameA}'s premium = $${owedByB.toFixed(2)}\n`;
-                }
-                if (premB > 0) {
-                    let owedByA = premB * shareA;
-                    insuranceAdj += (payerMath === "B") ? -owedByA : owedByA;
-                    insuranceTxt += `Proportional method: ${nameA} share of ${nameB}'s premium = $${owedByA.toFixed(2)}\n`;
-                }
-                if (premA === 0 && premB === 0) {
-                    insuranceTxt += `No private premiums entered under proportional method.\n`;
-                }
+            if (premA > 0) {
+                const owedByB = premA * shareB;
+                insuranceAdj += (payer === 'A') ? -owedByB : owedByB;
+                insuranceTxt += `${nameA} pays $${premA.toFixed(2)} premium; ${nameB} share ≈ $${owedByB.toFixed(2)}.\n`;
             }
-        } else if (insuranceMode === "worksheet") {
-            if (payerMath === "A" && premA > 0) {
-                let adj = -premA * 0.15;
-                insuranceAdj += adj;
-                insuranceTxt += `Worksheet method: credit to ${nameA} of $${(-adj).toFixed(2)} based on their premium.\n`;
-            } else if (payerMath === "B" && premB > 0) {
-                let adj = -premB * 0.15;
-                insuranceAdj += adj;
-                insuranceTxt += `Worksheet method: credit to ${nameB} of $${(-adj).toFixed(2)} based on their premium.\n`;
-            } else {
-                insuranceTxt += `Worksheet method selected but no payer premium entered; no adjustment applied.\n`;
+            if (premB > 0) {
+                const owedByA = premB * shareA;
+                insuranceAdj += (payer === 'B') ? -owedByA : owedByA;
+                insuranceTxt += `${nameB} pays $${premB.toFixed(2)} premium; ${nameA} share ≈ $${owedByA.toFixed(2)}.\n`;
             }
         } else {
-            insuranceTxt += `BadgerCare / no private insurance → no premium adjustment.\n`;
+            insuranceTxt += 'Proportional method selected but total gross income is zero.\n';
         }
+    } else if (insuranceMode === 'worksheet') {
+        let adj = 0;
+        if (payer === 'A' && premA > 0) adj = -premA * 0.15;
+        if (payer === 'B' && premB > 0) adj = -premB * 0.15;
+        insuranceAdj += adj;
+        insuranceTxt += `Worksheet method: adjustment for ${payName} ≈ $${adj.toFixed(2)}.\n`;
+    } else {
+        insuranceTxt += 'Insurance premiums ignored (BadgerCare / not considered).\n';
+    }
 
-        // --- SSDI Dependent Credit ---
-        let ssdiTxt = `SSDI dependent benefit credit applied to this order: -$${ssdiDep.toFixed(2)} per month.\n`;
-
-        // --- Final before judicial deviation & garnishment ---
-        let final = rawSupport + insuranceAdj - ssdiDep;
-        if (final < 0) final = 0;
-
-        // --- Judicial Deviation ---
-        let deviationTxt = "";
-        if (judgeDev !== 0) {
-            let beforeDev = final;
-            final = final * (1 + judgeDev / 100.0);
-            if (final < 0) final = 0;
-            deviationTxt = `Judicial deviation of ${judgeDev.toFixed(2)}% applied.\n` +
-                           `Amount before deviation: $${beforeDev.toFixed(2)}\n` +
-                           `Amount after deviation (pre-garnishment cap): $${final.toFixed(2)}\n`;
+    // SSDI dependent credit
+    let ssdiCredit = 0;
+    let ssdiTxt = '';
+    if (ssdiDep > 0 && (ssdiRecipient === 'A' || ssdiRecipient === 'B')) {
+        if (payer === 'A' && ssdiRecipient === 'B') {
+            ssdiCredit = ssdiDep;
+            ssdiTxt = `SSDI dependent benefit of $${ssdiDep.toFixed(2)} credited against ${nameA}'s obligation (benefit received by ${nameB}).`;
+        } else if (payer === 'B' && ssdiRecipient === 'A') {
+            ssdiCredit = ssdiDep;
+            ssdiTxt = `SSDI dependent benefit of $${ssdiDep.toFixed(2)} credited against ${nameB}'s obligation (benefit received by ${nameA}).`;
         } else {
-            deviationTxt = `No judicial deviation applied (0%).\n`;
+            ssdiTxt = `SSDI dependent benefit $${ssdiDep.toFixed(2)} entered, but under this simplified model no direct credit is applied because the payer and recipient are the same.`;
         }
+    } else if (ssdiDep > 0 && ssdiRecipient === 'none') {
+        ssdiTxt = `SSDI dependent benefit $${ssdiDep.toFixed(2)} entered with no recipient selected; no credit applied.`;
+    } else {
+        ssdiTxt = 'No SSDI dependent benefit credit applied.';
+    }
 
-        // --- WI Disposable Income Garnishment Cap ---
-        let garnishmentTxt = "";
-        if (useDisposable) {
-            let payerDisp = payerMath === "A" ? dispA : dispB;
-            if (payerDisp <= 0 || wiLimitPct <= 0) {
-                garnishmentTxt = `Garnishment cap selected, but disposable income or category is missing/zero. No cap applied.\n`;
-            } else {
-                let limitAmt = payerDisp * (wiLimitPct / 100.0);
-                if (final > limitAmt) {
-                    garnishmentTxt =
-                        `WI Disposable Income Garnishment Cap Applied for ${payingName}.\n` +
-                        `Maximum allowed under garnishment rules: $${limitAmt.toFixed(2)}\n` +
-                        `Calculated amount before cap: $${final.toFixed(2)}\n` +
-                        `Final amount after applying WI cap: $${limitAmt.toFixed(2)}\n`;
-                    final = limitAmt;
-                } else {
-                    garnishmentTxt =
-                        `Support for ${payingName} is within WI garnishment limit.\n` +
-                        `Limit: $${limitAmt.toFixed(2)} | Calculated amount: $${final.toFixed(2)}\n`;
-                }
-            }
-        } else {
-            garnishmentTxt = `WI disposable income garnishment cap NOT applied (toggle set to "No").\n`;
-        }
+    // Uncapped final support
+    let calcFinal = rawSupport + insuranceAdj - ssdiCredit + deviation;
+    if (calcFinal < 0) calcFinal = 0;
 
-        // --- Detailed output text ---
-        let out =
-`${nameA} Annual Gross: $${incA_year.toFixed(2)}  → Monthly: $${incA.toFixed(2)}
-${nameB} Annual Gross: $${incB_year.toFixed(2)}  → Monthly: $${incB.toFixed(2)}
+    // Garnishment cap for payer
+    let garnTxt = '';
+    let garnCap = Infinity;
+    const disp = (payer === 'A') ? dispA : dispB;
+    const intact = (payer === 'A') ? intactA : intactB;
+    const arrears = (payer === 'A') ? arrearsA : arrearsB;
 
-Placement (normalized to 100%):
-${nameA}: ${placeA.toFixed(2)}%
-${nameB}: ${placeB.toFixed(2)}%
+    if (disp > 0) {
+        let pct = 0.5;
+        if (intact && arrears) pct = 0.55;
+        if (!intact && !arrears) pct = 0.60;
+        if (!intact && arrears) pct = 0.65;
+        garnCap = disp * pct;
+        const pctText = (pct * 100).toFixed(0) + '%';
+        garnTxt += `Garnishment cap for ${payName}: ${pctText} of disposable $${disp.toFixed(2)} ≈ $${garnCap.toFixed(2)}.\n`;
+    } else {
+        garnTxt += `No disposable income entered for ${payName}; garnishment cap not evaluated.\n`;
+    }
 
-=== Serial-Family Adjustment (DCF 150.04 & Serial Worksheet) ===
+    // Enforce garnishment cap
+    let final = Math.min(calcFinal, garnCap);
+    if (!isFinite(garnCap)) final = calcFinal;
+
+    if (isFinite(garnCap) && calcFinal > garnCap) {
+        garnTxt += `Calculated support $${calcFinal.toFixed(2)} EXCEEDS this cap; estimated collectible amount is capped at ≈ $${final.toFixed(2)}.\n`;
+    } else if (isFinite(garnCap)) {
+        garnTxt += `Calculated support $${calcFinal.toFixed(2)} is within the garnishment cap. Estimated collectible amount: $${final.toFixed(2)}.\n`;
+    }
+
+    // Build detailed summary
+    const summary =
+`${nameA} yearly gross: $${yearA.toFixed(2)}  → monthly: $${grossA.toFixed(2)}
+${nameB} yearly gross: $${yearB.toFixed(2)}  → monthly: $${grossB.toFixed(2)}
+
+Placement (based on overnights):
+${nameA}: ${nightsA} nights (~${placeA.toFixed(2)}%)
+${nameB}: ${nightsB} nights (~${placeB.toFixed(2)}%)
+
+=== Serial-Family Adjustment ===
 ${serialTxt}
 
-=== Base Support (Percentage / High-Income Method) ===
+=== Base Support (DCF 150.03 / 150.04) ===
 ${baseTxt}
 
-=== Shared Placement Calculation (DCF 150 Shared Placement) ===
-${nameA} obligation: $${obligA.toFixed(2)}
-${nameB} obligation: $${obligB.toFixed(2)}
-Raw support difference (before insurance & SSDI): $${rawSupport.toFixed(2)}
-Payer by math (higher obligation): ${payingName}
+=== Shared Placement (DCF 150.04(2)) ===
+${nameA} obligation: $${obligA.toFixed(2)} / mo
+${nameB} obligation: $${obligB.toFixed(2)} / mo
+Raw difference (before insurance/SSDI/deviation): $${rawSupport.toFixed(2)} paid by ${payName} to ${otherName}
 
 === Insurance Adjustment (${insuranceMode}) ===
-${insuranceTxt}
+${insuranceTxt || 'No insurance adjustment.'}
 
-=== SSDI Dependent Benefit Credit ===
+=== SSDI Dependent Benefit ===
 ${ssdiTxt}
 
-=== Judicial Deviation ===
-${deviationTxt}
+Judicial deviation applied: ${deviation >= 0 ? '+' : ''}$${deviation.toFixed(2)}
 
-=== WI Disposable Income Garnishment Check ===
-${garnishmentTxt}
+=== FINAL ESTIMATE (MONTHLY) ===
+Guideline calculated support (uncapped): $${calcFinal.toFixed(2)} / month
+Garnishment cap: ${isFinite(garnCap) ? '$' + garnCap.toFixed(2) : 'N/A'}
+Estimated collectible support owed by ${payName}: $${final.toFixed(2)} / month
 
-=== FINAL ESTIMATE (THIS CASE ONLY) ===
-Parent paying by math: ${payingName}
-Final Support Owed for THIS case: $${final.toFixed(2)} / month
-(Serial-family handled through effective income; this calculator does not cap total support across all cases, consistent with WI serial-family rules.)
-`;
+=== Garnishment Check (Optional) ===
+${garnTxt}`;
 
-        document.getElementById("result").textContent = out;
+    document.getElementById('summaryBox').textContent = summary;
 
-        // --- Summary Table ---
-        let summaryHTML = `
-<table>
-    <tr>
-        <th>Item</th>
-        <th>Value</th>
-    </tr>
-    <tr>
-        <td>Parent A Monthly Gross</td>
-        <td>$${incA.toFixed(2)}</td>
-    </tr>
-    <tr>
-        <td>Parent B Monthly Gross</td>
-        <td>$${incB.toFixed(2)}</td>
-    </tr>
-    <tr>
-        <td>Effective Income for THIS Case (${nameA})</td>
-        <td>$${effA.toFixed(2)}</td>
-    </tr>
-    <tr>
-        <td>Effective Income for THIS Case (${nameB})</td>
-        <td>$${effB.toFixed(2)}</td>
-    </tr>
-    <tr>
-        <td>Base Support (${nameA})</td>
-        <td>$${baseA.toFixed(2)}</td>
-    </tr>
-    <tr>
-        <td>Base Support (${nameB})</td>
-        <td>$${baseB.toFixed(2)}</td>
-    </tr>
-    <tr>
-        <td>Shared Placement Obligation (${nameA})</td>
-        <td>$${obligA.toFixed(2)}</td>
-    </tr>
-    <tr>
-        <td>Shared Placement Obligation (${nameB})</td>
-        <td>$${obligB.toFixed(2)}</td>
-    </tr>
-    <tr>
-        <td>Raw Support Difference (before insurance & SSDI)</td>
-        <td>$${rawSupport.toFixed(2)}</td>
-    </tr>
-    <tr>
-        <td>Insurance Adjustment (payer-side)</td>
-        <td>$${insuranceAdj.toFixed(2)}</td>
-    </tr>
-    <tr>
-        <td>SSDI Dependent Credit (monthly)</td>
-        <td>-$${ssdiDep.toFixed(2)}</td>
-    </tr>
-    <tr>
-        <td>Judicial Deviation Applied</td>
-        <td>${judgeDev.toFixed(2)}%</td>
-    </tr>
-    <tr>
-        <td>WI Garnishment Cap Used?</td>
-        <td>${useDisposable ? "Yes (" + wiLimitPct.toFixed(0) + "% of disposable)" : "No"}</td>
-    </tr>
-    <tr>
-        <td>Actual Payer (by math)</td>
-        <td>${payingName}</td>
-    </tr>
-    <tr>
-        <td><strong>Final Monthly Support Owed (THIS case)</strong></td>
-        <td><strong>$${final.toFixed(2)}</strong></td>
-    </tr>
-</table>
-`;
-        document.getElementById("summaryTable").innerHTML = summaryHTML;
+    // Quick summary card (right side)
+    const quickDirection = document.getElementById('quickDirection');
+    const quickTotal = document.getElementById('quickTotal');
+    const quickA = document.getElementById('quickA');
+    const quickB = document.getElementById('quickB');
 
-    } catch (e) {
-        console.error("Calculation error:", e);
-        document.getElementById("result").textContent =
-            "An error occurred in the calculation. Check console for details: " + e.message;
+    let deltaA = 0, deltaB = 0;
+    if (final > 0) {
+        if (payer === 'A') {
+            deltaA = -final;
+            deltaB = final;
+            quickDirection.textContent = `${nameA} → ${nameB}`;
+        } else {
+            deltaB = -final;
+            deltaA = final;
+            quickDirection.textContent = `${nameB} → ${nameA}`;
+        }
+    } else {
+        quickDirection.textContent = 'No payment estimated.';
+    }
+
+    function formatDelta(d) {
+        if (d > 0) return `+ $${d.toFixed(2)}`;
+        if (d < 0) return `- $${Math.abs(d).toFixed(2)}`;
+        return '$0.00';
+    }
+    function classForDelta(d) {
+        if (d > 0) return 'quick-amount amount-rec';
+        if (d < 0) return 'quick-amount amount-owe';
+        return 'quick-amount amount-neutral';
+    }
+
+    quickA.textContent = formatDelta(deltaA);
+    quickA.className = classForDelta(deltaA);
+
+    quickB.textContent = formatDelta(deltaB);
+    quickB.className = classForDelta(deltaB);
+
+    if (final > 0) {
+        quickTotal.textContent = `$${final.toFixed(2)}`;
+        quickTotal.className = 'quick-total amount-owe'; // payment amount is always "owed"
+    } else {
+        quickTotal.textContent = '$0.00';
+        quickTotal.className = 'quick-total amount-neutral';
     }
 }
 
-// Real-time calculation: recalc on any input/select change
-document.addEventListener("DOMContentLoaded", function () {
-    const els = document.querySelectorAll("input, select");
-    els.forEach(el => {
-        el.addEventListener("input", runCalc);
-        el.addEventListener("change", runCalc);
+/* ---------- Wire up real-time events ---------- */
+window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', runCalc);
+        el.addEventListener('change', runCalc);
     });
     runCalc();
 });
