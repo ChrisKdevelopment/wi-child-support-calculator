@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://chriskdevelopment.github.io/wi-child-support-calculator/sitemap.xml
