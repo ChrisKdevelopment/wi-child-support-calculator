@@ -3,10 +3,46 @@
 <head>
 <meta charset="UTF-8" />
 
-    <!-- Google Search Console Verification -->
+<!-- Google Search Verification -->
 <meta name="google-site-verification" content="AQpDPy8WbkFqIIKiou7sRhunhgR5IXi6bxBrKq3PoYQ" />
 
-    <title>Wisconsin DCF 150 Child Support Calculator</title>
+<!-- SEO Title -->
+<title>Wisconsin Child Support Calculator (DCF 150) | Free & Accurate WI Support Estimate</title>
+
+<!-- Meta Description -->
+<meta name="description" content="Free Wisconsin DCF 150 Child Support Calculator with full shared-placement math, high earner tiers, SSDI credits, serial family adjustments, insurance offsets, garnishment caps, and attorney-style breakdowns. No ads. No fees. Not legal advice.">
+
+<!-- OpenGraph -->
+<meta property="og:title" content="Wisconsin DCF 150 Child Support Calculator">
+<meta property="og:description" content="Full WI child support calculation: shared placement, SSDI credits, serial family adjustments, high earner tiers, insurance offsets, and garnishment caps. Free, accurate, no ads.">
+<meta property="og:url" content="https://chriskdevelopment.github.io/wi-child-support-calculator/">
+<meta property="og:type" content="website">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Wisconsin DCF 150 Child Support Calculator">
+<meta name="twitter:description" content="Accurate WI child support calculator with full legal math. Free and no sign-up.">
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Wisconsin Child Support Calculator",
+  "url": "https://chriskdevelopment.github.io/wi-child-support-calculator/",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "description": "Free Wisconsin DCF 150 Child Support Calculator with shared placement math, high-earner tiers, SSDI credits, serial family adjustments, insurance offsets, and garnishment caps.",
+  "author": {
+    "@type": "Person",
+    "name": "Independent Developer"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0"
+  }
+}
+</script>
 
 <style>
     body {
@@ -571,34 +607,63 @@ function runCalc() {
     const obligA = baseA * 1.5 * (placeB / 100);
     const obligB = baseB * 1.5 * (placeA / 100);
 
-    let payer = 'A';
-    let payName = nameA;
-    let otherName = nameB;
-    let rawSupport = obligA - obligB;
-    if (rawSupport < 0) {
-        payer = 'B';
-        payName = nameB;
-        otherName = nameA;
-        rawSupport = Math.abs(rawSupport);
+    // Net shared-placement difference BEFORE deviation (signed)
+    const netBase = obligA - obligB; // >0 => A pays B; <0 => B pays A
+
+    let guidelinePayer, guidelinePayName, guidelineOtherName;
+    let guidelineAmount;
+    if (netBase >= 0) {
+        guidelinePayer = 'A';
+        guidelinePayName = nameA;
+        guidelineOtherName = nameB;
+        guidelineAmount = netBase;
+    } else {
+        guidelinePayer = 'B';
+        guidelinePayName = nameB;
+        guidelineOtherName = nameA;
+        guidelineAmount = Math.abs(netBase);
     }
 
-    // Insurance adjustments (to payer)
-    let insuranceTxt = '';
+    // Apply judicial deviation to the signed net amount
+    const netAfterDeviation = netBase + deviation;
+
+    let payerFinal, payNameFinal, otherNameFinal;
+    if (netAfterDeviation >= 0) {
+        payerFinal = 'A';
+        payNameFinal = nameA;
+        otherNameFinal = nameB;
+    } else {
+        payerFinal = 'B';
+        payNameFinal = nameB;
+        otherNameFinal = nameA;
+    }
+    const baseAfterDeviation = Math.abs(netAfterDeviation);
+
+    // Insurance adjustments (relative to final payer)
     let insuranceAdj = 0;
+    let insuranceTxt = '';
     if (insuranceMode === 'proportional') {
         const totalGross = grossA + grossB;
         if (totalGross > 0) {
             const shareA = grossA / totalGross;
-            const shareB = grossA + grossB === 0 ? 0 : grossB / totalGross;
+            const shareB = grossB / totalGross;
 
             if (premA > 0) {
                 const owedByB = premA * shareB;
-                insuranceAdj += (payer === 'A') ? -owedByB : owedByB;
+                if (payerFinal === 'A') {
+                    insuranceAdj -= owedByB;
+                } else if (payerFinal === 'B') {
+                    insuranceAdj += owedByB;
+                }
                 insuranceTxt += `${nameA} pays $${premA.toFixed(2)} premium; ${nameB} share ≈ $${owedByB.toFixed(2)}.\n`;
             }
             if (premB > 0) {
                 const owedByA = premB * shareA;
-                insuranceAdj += (payer === 'B') ? -owedByA : owedByA;
+                if (payerFinal === 'B') {
+                    insuranceAdj -= owedByA;
+                } else if (payerFinal === 'A') {
+                    insuranceAdj += owedByA;
+                }
                 insuranceTxt += `${nameB} pays $${premB.toFixed(2)} premium; ${nameA} share ≈ $${owedByA.toFixed(2)}.\n`;
             }
         } else {
@@ -606,22 +671,22 @@ function runCalc() {
         }
     } else if (insuranceMode === 'worksheet') {
         let adj = 0;
-        if (payer === 'A' && premA > 0) adj = -premA * 0.15;
-        if (payer === 'B' && premB > 0) adj = -premB * 0.15;
+        if (payerFinal === 'A' && premA > 0) adj = -premA * 0.15;
+        if (payerFinal === 'B' && premB > 0) adj = -premB * 0.15;
         insuranceAdj += adj;
-        insuranceTxt += `Worksheet method: adjustment for ${payName} ≈ $${adj.toFixed(2)}.\n`;
+        insuranceTxt += `Worksheet method: adjustment for ${payNameFinal} ≈ $${adj.toFixed(2)}.\n`;
     } else {
         insuranceTxt += 'Insurance premiums ignored (BadgerCare / not considered).\n';
     }
 
-    // SSDI dependent credit
+    // SSDI dependent credit (based on final payer)
     let ssdiCredit = 0;
     let ssdiTxt = '';
     if (ssdiDep > 0 && (ssdiRecipient === 'A' || ssdiRecipient === 'B')) {
-        if (payer === 'A' && ssdiRecipient === 'B') {
+        if (payerFinal === 'A' && ssdiRecipient === 'B') {
             ssdiCredit = ssdiDep;
             ssdiTxt = `SSDI dependent benefit of $${ssdiDep.toFixed(2)} credited against ${nameA}'s obligation (benefit received by ${nameB}).`;
-        } else if (payer === 'B' && ssdiRecipient === 'A') {
+        } else if (payerFinal === 'B' && ssdiRecipient === 'A') {
             ssdiCredit = ssdiDep;
             ssdiTxt = `SSDI dependent benefit of $${ssdiDep.toFixed(2)} credited against ${nameB}'s obligation (benefit received by ${nameA}).`;
         } else {
@@ -633,16 +698,16 @@ function runCalc() {
         ssdiTxt = 'No SSDI dependent benefit credit applied.';
     }
 
-    // Uncapped final support
-    let calcFinal = rawSupport + insuranceAdj - ssdiCredit + deviation;
+    // Uncapped final support after deviation, insurance, SSDI
+    let calcFinal = baseAfterDeviation + insuranceAdj - ssdiCredit;
     if (calcFinal < 0) calcFinal = 0;
 
-    // Garnishment cap for payer
+    // Garnishment cap for final payer
     let garnTxt = '';
     let garnCap = Infinity;
-    const disp = (payer === 'A') ? dispA : dispB;
-    const intact = (payer === 'A') ? intactA : intactB;
-    const arrears = (payer === 'A') ? arrearsA : arrearsB;
+    const disp = (payerFinal === 'A') ? dispA : dispB;
+    const intact = (payerFinal === 'A') ? intactA : intactB;
+    const arrears = (payerFinal === 'A') ? arrearsA : arrearsB;
 
     if (disp > 0) {
         let pct = 0.5;
@@ -651,19 +716,20 @@ function runCalc() {
         if (!intact && arrears) pct = 0.65;
         garnCap = disp * pct;
         const pctText = (pct * 100).toFixed(0) + '%';
-        garnTxt += `Garnishment cap for ${payName}: ${pctText} of disposable $${disp.toFixed(2)} ≈ $${garnCap.toFixed(2)}.\n`;
+        garnTxt += `Garnishment cap for ${payNameFinal}: ${pctText} of disposable $${disp.toFixed(2)} ≈ $${garnCap.toFixed(2)}.\n`;
     } else {
-        garnTxt += `No disposable income entered for ${payName}; garnishment cap not evaluated.\n`;
+        garnTxt += `No disposable income entered for ${payNameFinal}; garnishment cap not evaluated.\n`;
     }
 
     // Enforce garnishment cap
-    let final = Math.min(calcFinal, garnCap);
-    if (!isFinite(garnCap)) final = calcFinal;
-
-    if (isFinite(garnCap) && calcFinal > garnCap) {
-        garnTxt += `Calculated support $${calcFinal.toFixed(2)} EXCEEDS this cap; estimated collectible amount is capped at ≈ $${final.toFixed(2)}.\n`;
-    } else if (isFinite(garnCap)) {
-        garnTxt += `Calculated support $${calcFinal.toFixed(2)} is within the garnishment cap. Estimated collectible amount: $${final.toFixed(2)}.\n`;
+    let final = calcFinal;
+    if (isFinite(garnCap)) {
+        if (calcFinal > garnCap) {
+            final = garnCap;
+            garnTxt += `Calculated support $${calcFinal.toFixed(2)} EXCEEDS this cap; estimated collectible amount is capped at ≈ $${final.toFixed(2)}.\n`;
+        } else {
+            garnTxt += `Calculated support $${calcFinal.toFixed(2)} is within the garnishment cap. Estimated collectible amount: $${final.toFixed(2)}.\n`;
+        }
     }
 
     // Build detailed summary
@@ -682,9 +748,9 @@ ${serialTxt}
 ${baseTxt}
 
 === Shared Placement (DCF 150.04(2)) ===
-${nameA} obligation: $${obligA.toFixed(2)} / mo
-${nameB} obligation: $${obligB.toFixed(2)} / mo
-Raw difference (before insurance/SSDI/deviation): $${rawSupport.toFixed(2)} paid by ${payName} to ${otherName}
+Guideline net difference (before deviation): $${guidelineAmount.toFixed(2)} paid by ${guidelinePayName} to ${guidelineOtherName}
+Judicial deviation applied: ${deviation >= 0 ? '+' : ''}$${deviation.toFixed(2)}
+Net difference after deviation (before insurance/SSDI): $${baseAfterDeviation.toFixed(2)} paid by ${payNameFinal} to ${otherNameFinal}
 
 === Insurance Adjustment (${insuranceMode}) ===
 ${insuranceTxt || 'No insurance adjustment.'}
@@ -692,12 +758,10 @@ ${insuranceTxt || 'No insurance adjustment.'}
 === SSDI Dependent Benefit ===
 ${ssdiTxt}
 
-Judicial deviation applied: ${deviation >= 0 ? '+' : ''}$${deviation.toFixed(2)}
-
 === FINAL ESTIMATE (MONTHLY) ===
-Guideline calculated support (uncapped): $${calcFinal.toFixed(2)} / month
+Guideline calculated support (uncapped after deviation/credits): $${calcFinal.toFixed(2)} / month
 Garnishment cap: ${isFinite(garnCap) ? '$' + garnCap.toFixed(2) : 'N/A'}
-Estimated collectible support owed by ${payName}: $${final.toFixed(2)} / month
+Estimated collectible support owed by ${payNameFinal}: $${final.toFixed(2)} / month
 
 === Garnishment Check (Optional) ===
 ${garnTxt}`;
@@ -712,7 +776,7 @@ ${garnTxt}`;
 
     let deltaA = 0, deltaB = 0;
     if (final > 0) {
-        if (payer === 'A') {
+        if (payerFinal === 'A') {
             deltaA = -final;
             deltaB = final;
             quickDirection.textContent = `${nameA} → ${nameB}`;
@@ -744,7 +808,7 @@ ${garnTxt}`;
 
     if (final > 0) {
         quickTotal.textContent = `$${final.toFixed(2)}`;
-        quickTotal.className = 'quick-total amount-owe'; // payment amount is always "owed"
+        quickTotal.className = 'quick-total amount-owe';
     } else {
         quickTotal.textContent = '$0.00';
         quickTotal.className = 'quick-total amount-neutral';
@@ -763,4 +827,3 @@ window.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
